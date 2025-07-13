@@ -1,0 +1,105 @@
+header {
+    background-color: #004085;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+header img {
+    height: 60px;
+    vertical-align: middle;
+}
+
+header h1 {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 1rem;
+    color: white;
+    border-bottom: none;
+}
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+    margin: 0;
+}
+
+.container {
+    width: 80%;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.container h1, .container h2 {
+    color: #004085;
+    border-bottom: 2px solid #b8daff;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.input-form {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.input-form input, .input-form button {
+    display: block;
+    width: calc(100% - 2rem);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.input-form button {
+    width: auto;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+}
+
+.input-form button:hover {
+    background-color: #0056b3;
+}
+
+.chart-container {
+    margin-bottom: 2rem;
+}
+
+.prediction-container {
+    background-color: #e2e3e5;
+    padding: 1.5rem;
+    border: 1px solid #d6d8db;
+    border-radius: 0.25rem;
+    text-align: center;
+}
+
+#predicted-bill {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #155724;
+    margin-bottom: 1rem;
+}
+
+#download-bill-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.25rem;
+}
+
+#download-bill-btn:hover {
+    background-color: #218838;
+}

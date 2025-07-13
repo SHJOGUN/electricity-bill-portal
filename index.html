@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Electricity Bill Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="text-center py-3">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/80px-Emblem_of_India.svg.png" alt="National Emblem of India" style="height: 60px;">
+        <h1 class="d-inline-block align-middle ml-2">Electricity Bill Tracking Portal</h1>
+    </header>
+    <div class="container">
+        <h1 class="text-center">Dynamic Electricity Bill Tracker</h1>
+        <div class="input-form">
+            <h2>Enter Consumption Data</h2>
+            <input type="date" id="date-input">
+            <input type="number" id="consumption-input" placeholder="Enter units consumed">
+            <button id="add-data-btn">Add Data</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="consumption-chart"></canvas>
+        </div>
+        <div class="prediction-container">
+            <h2>Predicted Bill</h2>
+            <p id="predicted-bill">₹0.00</p>
+            <button id="download-bill-btn">Download Bill</button>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/2.29.3/date_fns.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
