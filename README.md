@@ -42,15 +42,6 @@ To run this project locally, follow these steps:
 4.  **Open the application:**
     Open your web browser and navigate to `http://localhost:3000`.
 
-## Contributors
-
-This project was a collaborative effort by the following team members:
-
-*   [Contributor Name 1]
-*   [Contributor Name 2]
-*   [Contributor Name 3]
-*   [Contributor Name 4]
-
 ## Development Timeline (10 Days)
 
 *   **Day 1-2: Planning & Setup**
