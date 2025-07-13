@@ -7,21 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = document.getElementById('consumption-chart').getContext('2d');
 
     let chart;
+    let consumptionRecords = []; // To store fetched consumption data
 
     const API_URL = 'http://localhost:3000/api';
-
-    // Ensure dateFns is globally available for chartjs-adapter-date-fns
-    // The UMD build of date-fns might not always attach to window.dateFns directly.
-    // This ensures it's there if not already.
-    if (typeof dateFns === 'undefined' && typeof window.dateFns === 'undefined') {
-        // This assumes the UMD build is loaded and exposes itself in some way,
-        // or we might need to load a specific global build.
-        // For now, we'll assume it's available via a different global or needs explicit assignment.
-        // A more robust solution might involve importing it if using a module bundler.
-        // Given the current setup, we'll rely on the CDN to expose it.
-        // If the error persists, the CDN link itself might not be providing the expected global.
-        console.warn("dateFns not found globally. Chart.js adapter might fail.");
-    }
 
     function initializeChart() {
         chart = new Chart(ctx, {
@@ -45,8 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         adapters: {
                             date: {
-                                // Ensure dateFns.enUS is correctly referenced
-                                locale: window.dateFns.enUS || dateFns.enUS
+                                locale: dateFns.enUS
                             }
                         }
                     },
@@ -62,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`${API_URL}/consumption`);
             const data = await response.json();
+            consumptionRecords = data; // Store the fetched data
             updateChart(data);
         } catch (error) {
             console.error('Error fetching consumption data:', error);
@@ -115,22 +103,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function downloadBill() {
+    function downloadBill(data) {
         const billAmount = predictedBillEl.textContent;
-        const inputDate = dateInput.value; // Get the date from the input field
+        const inputDate = dateInput.value;
 
         let statementDate = 'N/A';
         let periodFrom = 'N/A';
         let periodUntil = 'N/A';
         let dueDate = 'N/A';
 
-        if (inputDate) {
-            const parsedDate = dateFns.parseISO(inputDate); // Parse the input date
-            statementDate = dateFns.format(parsedDate, 'MMMM dd, yyyy');
-            periodUntil = dateFns.format(parsedDate, 'MMMM dd, yyyy');
-            periodFrom = dateFns.format(dateFns.subDays(parsedDate, 12), 'MMMM dd, yyyy'); // 12 days before for example
-            dueDate = dateFns.format(dateFns.addDays(parsedDate, 6), 'MMMM dd, yyyy'); // 6 days after for example
+        let totalConsumption = 0;
+        let currentCharges = 0;
+        const TARIFF_PER_UNIT = 7.5; // This should ideally come from server or config
+
+        if (data && data.length > 0) {
+            // Get the latest date from the data for statement date and period until
+            const latestRecord = data[data.length - 1];
+            const parsedLatestDate = dateFns.parseISO(latestRecord.date);
+            statementDate = dateFns.format(parsedLatestDate, 'MMMM dd, yyyy');
+            periodUntil = dateFns.format(parsedLatestDate, 'MMMM dd, yyyy');
+            periodFrom = dateFns.format(dateFns.subDays(parsedLatestDate, 30), 'MMMM dd, yyyy'); // Assuming a monthly bill
+            dueDate = dateFns.format(dateFns.addDays(parsedLatestDate, 15), 'MMMM dd, yyyy'); // Due 15 days after statement
+
+            // Calculate total consumption and current charges for the period
+            // For simplicity, let's sum all available data for "current charges" in the bill
+            // A more robust solution would involve filtering data for the specific billing period
+            totalConsumption = data.reduce((sum, record) => sum + record.consumption, 0);
+            currentCharges = totalConsumption * TARIFF_PER_UNIT;
         }
+
+        const meterInfoRows = data.map(d => `
+            <tr>
+                <td>${dateFns.format(dateFns.parseISO(d.date), 'MM/dd/yyyy')}</td>
+                <td>${d.consumption.toFixed(2)}</td>
+                <td>${TARIFF_PER_UNIT.toFixed(2)}</td>
+                <td>${(d.consumption * TARIFF_PER_UNIT).toFixed(2)}</td>
+            </tr>
+        `).join('');
 
         const billContent = `
             <!DOCTYPE html>
@@ -170,14 +179,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         <strong>Meter Information</strong>
                         <table>
                             <tr><th>Date</th><th>Usage (kWh)</th><th>Cost (per kWh)</th><th>Amount (₹)</th></tr>
-                            <tr><td>${inputDate ? dateFns.format(dateFns.parseISO(inputDate), 'MM/dd/yyyy') : 'N/A'}</td><td>300</td><td>10</td><td>3000</td></tr>
+                            ${meterInfoRows}
                         </table>
                     </div>
                     <div class="bill-summary">
                         <strong>Bill Summary</strong>
                         <table class="summary-table">
-                            <tr><td>Previous Charges (₹)</td><td>₹ 1.00</td></tr>
-                            <tr><td>Current Charges (₹)</td><td>₹ 3,000.00</td></tr>
+                            <tr><td>Previous Charges (₹)</td><td>₹ 0.00</td></tr>
+                            <tr><td>Current Charges (₹)</td><td>₹ ${currentCharges.toFixed(2)}</td></tr>
                             <tr><td>Total Amount (₹)</td><td>${billAmount}</td></tr>
                             <tr><td>Due Date</td><td>${dueDate}</td></tr>
                         </table>
@@ -198,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     addDataBtn.addEventListener('click', addData);
-    downloadBillBtn.addEventListener('click', downloadBill);
+    downloadBillBtn.addEventListener('click', () => downloadBill(consumptionRecords));
     initializeChart();
     fetchConsumptionData();
     predictBill();
